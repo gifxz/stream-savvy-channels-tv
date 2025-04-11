@@ -13,6 +13,7 @@ import Account from "@/pages/Account";
 import SignIn from "@/pages/SignIn";
 import SignUp from "@/pages/SignUp";
 import NotFound from "@/pages/NotFound";
+import Player from "@/pages/Player";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,11 @@ const AppRoutes = () => {
         <Route path="account" element={
           <ProtectedRoute>
             <Account />
+          </ProtectedRoute>
+        } />
+        <Route path="player" element={
+          <ProtectedRoute>
+            <Player />
           </ProtectedRoute>
         } />
         

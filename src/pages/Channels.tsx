@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { channels, categories } from "@/data/mockData";
 import ChannelCard from "@/components/ChannelCard";
 import CategoryFilter from "@/components/CategoryFilter";
@@ -12,6 +13,7 @@ import { Channel } from "@/types";
 
 const Channels: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
@@ -30,6 +32,10 @@ const Channels: React.FC = () => {
     
     return categoryMatch && searchMatch && premiumMatch;
   });
+
+  const handleWatchChannel = (channel: Channel) => {
+    navigate(`/player?channelId=${channel.id}`);
+  };
 
   return (
     <div className="space-y-6">
@@ -125,7 +131,13 @@ const Channels: React.FC = () => {
                 )}
                 
                 <div className="flex justify-end">
-                  <Button className="bg-tv-primary hover:bg-tv-primary/90 tv-btn">
+                  <Button 
+                    className="bg-tv-primary hover:bg-tv-primary/90 tv-btn"
+                    onClick={() => {
+                      setSelectedChannel(null);
+                      handleWatchChannel(selectedChannel);
+                    }}
+                  >
                     {selectedChannel.isLive ? "Watch Live" : "View Channel"}
                   </Button>
                 </div>
