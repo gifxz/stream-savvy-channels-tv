@@ -299,6 +299,7 @@ export const mockUser = {
   name: "Demo User",
   subscriptionPlan: subscriptionPlans[1],
   subscriptionStatus: "active" as const,
+  role: "admin", // Updated to admin role
   billingInfo: {
     name: "Demo User",
     address: "123 Main St",
