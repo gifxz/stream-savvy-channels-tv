@@ -3,14 +3,17 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { User } from "@/types";
 import { mockUser } from "@/data/mockData";
 import { useToast } from "@/hooks/use-toast";
+import { DatabaseService } from "@/services/DatabaseService";
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   register: (email: string, password: string, name: string) => Promise<void>;
+  updateUser: (userData: Partial<User>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,19 +31,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+    // Initialize database
+    DatabaseService.init();
     setIsLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // This is a mock login - in a real app, you would call an API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Check if the user exists in our mock database
+      const users = DatabaseService.getUsers();
+      const foundUser = users.find(u => u.email === email);
       
-      // Check mock credentials (for demo purposes)
-      if (email === "user@example.com" && password === "password") {
-        setUser(mockUser);
-        localStorage.setItem("pptv_user", JSON.stringify(mockUser));
+      // For demo purposes, we're not actually checking the password
+      // In a real app, you would hash and compare passwords
+      if (foundUser) {
+        // Update last login
+        const updatedUser = {
+          ...foundUser,
+          lastLogin: new Date().toISOString()
+        };
+        DatabaseService.updateUser(updatedUser);
+        setUser(updatedUser);
+        localStorage.setItem("pptv_user", JSON.stringify(updatedUser));
+        toast({
+          title: "Success",
+          description: "You have successfully logged in",
+        });
+      } else if (email === "admin@example.com" && password === "admin123") {
+        // Default admin user
+        const adminUser: User = {
+          id: "admin-1",
+          email: "admin@example.com",
+          name: "Administrator",
+          role: "admin",
+          createdAt: new Date().toISOString(),
+          lastLogin: new Date().toISOString()
+        };
+        DatabaseService.addUser(adminUser);
+        setUser(adminUser);
+        localStorage.setItem("pptv_user", JSON.stringify(adminUser));
+        toast({
+          title: "Admin Login",
+          description: "You have successfully logged in as administrator",
+        });
+      } else if (email === "user@example.com" && password === "password") {
+        // Default regular user
+        const regularUser = {
+          ...mockUser,
+          lastLogin: new Date().toISOString()
+        };
+        DatabaseService.addUser(regularUser);
+        setUser(regularUser);
+        localStorage.setItem("pptv_user", JSON.stringify(regularUser));
         toast({
           title: "Success",
           description: "You have successfully logged in",
@@ -72,19 +115,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const register = async (email: string, password: string, name: string) => {
     setIsLoading(true);
     try {
-      // This is a mock registration - in a real app, you would call an API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Check if the user already exists
+      const users = DatabaseService.getUsers();
+      const userExists = users.some(u => u.email === email);
       
-      // Create a new user (for demo purposes)
+      if (userExists) {
+        throw new Error("User with this email already exists");
+      }
+      
+      // Create a new user
       const newUser: User = {
         ...mockUser,
         id: `user-${Date.now()}`,
         email,
         name,
+        role: "user",
         subscriptionPlan: undefined,
         subscriptionStatus: "inactive",
+        createdAt: new Date().toISOString(),
+        lastLogin: new Date().toISOString()
       };
       
+      DatabaseService.addUser(newUser);
       setUser(newUser);
       localStorage.setItem("pptv_user", JSON.stringify(newUser));
       toast({
@@ -94,12 +146,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (error) {
       toast({
         title: "Error",
-        description: "Registration failed",
+        description: error instanceof Error ? error.message : "Registration failed",
         variant: "destructive",
       });
       throw error;
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const updateUser = async (userData: Partial<User>) => {
+    if (!user) return;
+    
+    try {
+      const updatedUser = { ...user, ...userData };
+      DatabaseService.updateUser(updatedUser);
+      setUser(updatedUser);
+      localStorage.setItem("pptv_user", JSON.stringify(updatedUser));
+      toast({
+        title: "Success",
+        description: "User profile updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update user profile",
+        variant: "destructive",
+      });
+      throw error;
     }
   };
 
@@ -109,9 +183,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         user,
         isLoading,
         isAuthenticated: !!user,
+        isAdmin: user?.role === 'admin',
         login,
         logout,
         register,
+        updateUser,
       }}
     >
       {children}

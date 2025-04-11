@@ -8,6 +8,9 @@ export interface User {
   subscriptionPlan?: SubscriptionPlan;
   subscriptionStatus?: 'active' | 'inactive' | 'canceled';
   billingInfo?: BillingInfo;
+  role?: 'user' | 'admin';
+  createdAt?: string;
+  lastLogin?: string;
 }
 
 export interface BillingInfo {
@@ -28,6 +31,7 @@ export interface SubscriptionPlan {
   billingCycle: 'monthly' | 'yearly';
   features: string[];
   channelCount: number;
+  isActive?: boolean;
 }
 
 // Channel types

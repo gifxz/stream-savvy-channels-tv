@@ -14,6 +14,7 @@ import SignIn from "@/pages/SignIn";
 import SignUp from "@/pages/SignUp";
 import NotFound from "@/pages/NotFound";
 import Player from "@/pages/Player";
+import Admin from "@/pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,25 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   
   if (!isAuthenticated) {
     return <Navigate to="/signin" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// Admin route component
+const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isAdmin, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/signin" replace />;
+  }
+  
+  if (!isAdmin) {
+    return <Navigate to="/" replace />;
   }
   
   return <>{children}</>;
@@ -56,6 +76,13 @@ const AppRoutes = () => {
           <ProtectedRoute>
             <Player />
           </ProtectedRoute>
+        } />
+        
+        {/* Admin Routes */}
+        <Route path="admin" element={
+          <AdminRoute>
+            <Admin />
+          </AdminRoute>
         } />
         
         {/* Catch-all route */}

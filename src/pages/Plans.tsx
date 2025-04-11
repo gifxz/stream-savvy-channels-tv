@@ -82,7 +82,7 @@ const Plans: React.FC = () => {
           const displayPlan = {
             ...plan,
             price: isAnnual ? parseFloat(annualPrice) / 12 : plan.price,
-            billingCycle: isAnnual ? "yearly" : "monthly"
+            billingCycle: isAnnual ? "yearly" : "monthly" as "yearly" | "monthly"
           };
           
           return (
