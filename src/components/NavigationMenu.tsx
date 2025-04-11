@@ -12,12 +12,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { LogOut, User } from "lucide-react";
-import { useMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 const NavigationMenu: React.FC = () => {
   const { isAuthenticated, isAdmin, logout, user } = useAuth();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
 
   if (isMobile) {
     return (
@@ -120,45 +120,53 @@ const NavigationMenu: React.FC = () => {
         <NavigationMenuList>
           <NavigationMenuItem>
             <NavLink to="/">
-              <NavigationMenuLink className={({ isActive }: { isActive: boolean }) => cn(
-                "px-4 py-2 hover:text-tv-primary transition-colors",
-                isActive ? "text-tv-primary font-medium" : "text-tv-text-secondary"
-              )}>
-                Home
-              </NavigationMenuLink>
+              {({ isActive }) => (
+                <NavigationMenuLink className={cn(
+                  "px-4 py-2 hover:text-tv-primary transition-colors",
+                  isActive ? "text-tv-primary font-medium" : "text-tv-text-secondary"
+                )}>
+                  Home
+                </NavigationMenuLink>
+              )}
             </NavLink>
           </NavigationMenuItem>
           {isAuthenticated && (
             <NavigationMenuItem>
               <NavLink to="/channels">
-                <NavigationMenuLink className={({ isActive }: { isActive: boolean }) => cn(
-                  "px-4 py-2 hover:text-tv-primary transition-colors",
-                  isActive ? "text-tv-primary font-medium" : "text-tv-text-secondary"
-                )}>
-                  Channels
-                </NavigationMenuLink>
+                {({ isActive }) => (
+                  <NavigationMenuLink className={cn(
+                    "px-4 py-2 hover:text-tv-primary transition-colors",
+                    isActive ? "text-tv-primary font-medium" : "text-tv-text-secondary"
+                  )}>
+                    Channels
+                  </NavigationMenuLink>
+                )}
               </NavLink>
             </NavigationMenuItem>
           )}
           <NavigationMenuItem>
             <NavLink to="/plans">
-              <NavigationMenuLink className={({ isActive }: { isActive: boolean }) => cn(
-                "px-4 py-2 hover:text-tv-primary transition-colors",
-                isActive ? "text-tv-primary font-medium" : "text-tv-text-secondary"
-              )}>
-                Plans
-              </NavigationMenuLink>
+              {({ isActive }) => (
+                <NavigationMenuLink className={cn(
+                  "px-4 py-2 hover:text-tv-primary transition-colors",
+                  isActive ? "text-tv-primary font-medium" : "text-tv-text-secondary"
+                )}>
+                  Plans
+                </NavigationMenuLink>
+              )}
             </NavLink>
           </NavigationMenuItem>
           {isAdmin && (
             <NavigationMenuItem>
               <NavLink to="/admin">
-                <NavigationMenuLink className={({ isActive }: { isActive: boolean }) => cn(
-                  "px-4 py-2 hover:text-tv-primary transition-colors font-medium",
-                  isActive ? "text-tv-primary" : "text-tv-primary/80"
-                )}>
-                  Admin
-                </NavigationMenuLink>
+                {({ isActive }) => (
+                  <NavigationMenuLink className={cn(
+                    "px-4 py-2 hover:text-tv-primary transition-colors font-medium",
+                    isActive ? "text-tv-primary" : "text-tv-primary/80"
+                  )}>
+                    Admin
+                  </NavigationMenuLink>
+                )}
               </NavLink>
             </NavigationMenuItem>
           )}

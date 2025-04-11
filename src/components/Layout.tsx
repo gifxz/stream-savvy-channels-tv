@@ -36,7 +36,7 @@ const Layout: React.FC = () => {
             </Sheet>
           ) : (
             <nav className="ml-auto flex gap-4">
-              <NavigationMenu className="flex-row" />
+              <NavigationMenu />
             </nav>
           )}
         </div>
