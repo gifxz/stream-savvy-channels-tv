@@ -1,4 +1,3 @@
-
 import { Channel, Category, SubscriptionPlan } from "@/types";
 
 // Mock subscription plans
@@ -299,7 +298,7 @@ export const mockUser = {
   name: "Demo User",
   subscriptionPlan: subscriptionPlans[1],
   subscriptionStatus: "active" as const,
-  role: "admin" as "admin" | "user", // Properly typed as union type
+  role: "admin" as "admin" | "user", // Ensuring Demo user has admin role
   billingInfo: {
     name: "Demo User",
     address: "123 Main St",
